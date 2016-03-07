@@ -1,0 +1,6 @@
+steamAPI\dota2WebAPI.class
+compendium\stats\TeamStats.class
+compendium\stats\CompendiumStats.class
+compendium\stats\Dota2Const.class
+compendium\stats\PlayerStats.class
+compendium\stats\HeroStats.class
