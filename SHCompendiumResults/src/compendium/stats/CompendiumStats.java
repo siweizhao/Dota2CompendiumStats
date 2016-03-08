@@ -1,5 +1,4 @@
 package compendium.stats;
-import compendium.stats.*;
 
 import java.util.ArrayList;
 
@@ -12,20 +11,18 @@ public class CompendiumStats {
 	ArrayList<TeamStats> teamStatsList;
 	
 	int numGames;
-	int numMinimumGamesPlayed;
 	ArrayList<String> heroesPicked;
 	ArrayList<String> heroesBanned;
 	
 	int mostCombinedKills;
 	String mostCombinedKills_MatchId;
 	
-	public CompendiumStats(String[] heroNameList, int numMinimumGamesPlayed){
+	public CompendiumStats(String[] heroNameList){
 		heroStatsList = new HeroStats[Dota2Const.NUM_HEROES];
 		for (int i = 1; i < Dota2Const.NUM_HEROES; i ++){
 			HeroStats hero = new HeroStats(i, heroNameList[i]);
 			heroStatsList[i] = hero;
 		}
-		this.numMinimumGamesPlayed = numMinimumGamesPlayed;
 		playerStatsList = new ArrayList<PlayerStats>();
 		teamStatsList = new ArrayList<TeamStats>();
 		
@@ -141,93 +138,283 @@ public class CompendiumStats {
 		
 	}
 
-	public void printTournamentStats(){
-		//Hero Stats
+	public void printTournamentStats_Top(int numMinimumGamesPlayed, int numResults){
+		//Heroes
+		ArrayList<HeroStats> topMostPickedHeroes = getTop_HeroMostPicked(numResults);
+		ArrayList<HeroStats> topMostBannedHero = getTop_HeroMostBanned(numResults);
+		ArrayList<HeroStats> topHighestWRHeroes = getTop_HeroHighestWR(numResults, numMinimumGamesPlayed);
+		ArrayList<HeroStats> topHighestKillAvgHeroes = getTop_HeroHighestKillAvg(numResults, numMinimumGamesPlayed);
+		ArrayList<HeroStats> topHighestAssistAvgHeroes = getTop_HeroHighestAssistAvg(numResults, numMinimumGamesPlayed);
+		ArrayList<HeroStats> topLeastDeathAvgHeroes = getTop_HeroLeastDeathAvg(numResults, numMinimumGamesPlayed);
+		ArrayList<HeroStats> topHighestLHAvgHeroes = getTop_HeroHighestLHAvg(numResults, numMinimumGamesPlayed);
+		ArrayList<HeroStats> topHighestGPMAvgHeroes = getTop_HeroHighesGPMAvg(numResults, numMinimumGamesPlayed);
+		ArrayList<HeroStats> topMostKillsHeroes = getTop_HeroMostKills(numResults);
+		ArrayList<HeroStats> topMostLHHeroes = getTop_HeroMostLH(numResults);
+		
 		System.out.println("Hero Stats (minimum " + numMinimumGamesPlayed + " games played)" );
-		HeroStats mostPickedHero = getHeroMostPicked();
-		HeroStats mostBannedHero = getHeroMostBanned();
-		HeroStats highestWRHero = getHeroHighestWR();
-		HeroStats highestKillAvgHero = getHeroHighestKillAvg();
-		HeroStats highestAssistAvgHero = getHeroHighestAssistAvg();
-		HeroStats leastDeathAvgHero = getHeroLeastDeathAvg();
-		HeroStats highestLHAvgHero = getHeroHighestLHAvg();
-		HeroStats highestGPMAvgHero = getHeroHighestGPMAvg();
-		HeroStats mostKillsHero = getHeroMostKills();
-		HeroStats mostLHHero = getHeroMostLH();
-		
 		System.out.printf("%-30s%-20s%10s%20s\n", "Category", "Hero", "Result", "Match Id");
-		System.out.printf("%-30s%-20s%10d\n", "Most Picked:", mostPickedHero.getName(), mostPickedHero.getNumPicked());
-		if (mostBannedHero != null)
-			System.out.printf("%-30s%-20s%10d\n", "Most Banned:", mostBannedHero.getName(), mostBannedHero.getNumBanned());
-		if (highestWRHero != null)
-			System.out.printf("%-30s%-20s%10.2f\n", "Highest WR:", highestWRHero.getName(), highestWRHero.getWinrate());
-		if (highestKillAvgHero != null)
-			System.out.printf("%-30s%-20s%10.2f\n", "Highest Kill Avg:", highestKillAvgHero.getName(), highestKillAvgHero.getAvgKill());
-		if (highestAssistAvgHero != null)
-			System.out.printf("%-30s%-20s%10.2f\n", "Highest Assist Avg:", highestAssistAvgHero.getName(), highestAssistAvgHero.getAvgAssist());
-		if (leastDeathAvgHero != null)
-			System.out.printf("%-30s%-20s%10.2f\n", "Least Death Avg:", leastDeathAvgHero.getName(), leastDeathAvgHero.getAvgDeath());
-		if (highestLHAvgHero != null)
-			System.out.printf("%-30s%-20s%10.2f\n", "Highest LH Avg:", highestLHAvgHero.getName(), highestLHAvgHero.getAvgLH());
-		if (highestLHAvgHero != null)
-			System.out.printf("%-30s%-20s%10.2f\n", "Highest GPM Avg:", highestGPMAvgHero.getName(), highestGPMAvgHero.getAvgGPM());
-		System.out.printf("%-30s%-20s%10d%20s\n", "Most Kills:", mostKillsHero.getName(), mostKillsHero.getMostKills(),mostKillsHero.getMostKills_MatchId());
-		System.out.printf("%-30s%-20s%10d%20s\n", "Most LH:", mostLHHero.getName(), mostLHHero.getMostLH(), mostLHHero.getMostLH_MatchId());
-
-		//Player Stats
+		for (int i = 0; i < numResults; i ++){
+			HeroStats mostPickedHero = topMostPickedHeroes.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d\n", "Most Picked:", mostPickedHero.getName(), mostPickedHero.getNumPicked());
+			else 
+				System.out.printf("%-30s%-20s%10d\n", "", mostPickedHero.getName(), mostPickedHero.getNumPicked());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			HeroStats mostBannedHero = topMostBannedHero.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d\n", "Most Banned:", mostBannedHero.getName(), mostBannedHero.getNumBanned());
+			else 
+				System.out.printf("%-30s%-20s%10d\n", "", mostBannedHero.getName(), mostBannedHero.getNumBanned());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			HeroStats highestWRHero = topHighestWRHeroes.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Highest WR:", highestWRHero.getName(), highestWRHero.getWinrate());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", highestWRHero.getName(), highestWRHero.getWinrate());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			HeroStats highestKillAvgHero = topHighestKillAvgHeroes.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Highest Kill Avg:", highestKillAvgHero.getName(), highestKillAvgHero.getAvgKills());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", highestKillAvgHero.getName(), highestKillAvgHero.getAvgKills());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			HeroStats highestAssistAvgHero = topHighestAssistAvgHeroes.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Highest Assist Avg:", highestAssistAvgHero.getName(), highestAssistAvgHero.getAvgAssists());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", highestAssistAvgHero.getName(), highestAssistAvgHero.getAvgAssists());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			HeroStats leastDeathAvgHero = topLeastDeathAvgHeroes.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Least Death Avg:", leastDeathAvgHero.getName(), leastDeathAvgHero.getAvgDeaths());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", leastDeathAvgHero.getName(), leastDeathAvgHero.getAvgDeaths());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			HeroStats highestLHAvgHero = topHighestLHAvgHeroes.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Highest LH Avg:", highestLHAvgHero.getName(), highestLHAvgHero.getAvgLH());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", highestLHAvgHero.getName(), highestLHAvgHero.getAvgLH());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			HeroStats highestGPMAvgHero = topHighestGPMAvgHeroes.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Highest GPM Avg:", highestGPMAvgHero.getName(), highestGPMAvgHero.getAvgGPM());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", highestGPMAvgHero.getName(), highestGPMAvgHero.getAvgGPM());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			HeroStats mostKillsHero = topMostKillsHeroes.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d%20s\n", "Most Kills:", mostKillsHero.getName(), mostKillsHero.getMostKills(),mostKillsHero.getMostKills_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10d%20s\n", "", mostKillsHero.getName(), mostKillsHero.getMostKills(),mostKillsHero.getMostKills_MatchId());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			HeroStats mostLHHero = topMostLHHeroes.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d%20s\n", "Most LH:", mostLHHero.getName(), mostLHHero.getMostLH(),mostLHHero.getMostLH_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10d%20s\n", "", mostLHHero.getName(), mostLHHero.getMostLH(),mostLHHero.getMostLH_MatchId());
+		}	
+		
+		//Players
+		ArrayList<PlayerStats> topHighestKillAvgPlayers = getTop_PlayerHighestKillAvg(numResults);
+		ArrayList<PlayerStats> topMostKillsPlayers = getTop_PlayerMostKills(numResults);
+		ArrayList<PlayerStats> topLowestDeathsAvgPlayers = getTop_PlayerLowestDeathsAvg(numResults);
+		ArrayList<PlayerStats> topHighestAssistsAvgPlayers = getTop_PlayerHighestAssistsAvg(numResults);
+		ArrayList<PlayerStats> topMostAssistsPlayers = getTop_PlayerMostAssists(numResults);
+		ArrayList<PlayerStats> topHighestLHAvgPlayers = getTop_PlayerHighestLHAvg(numResults);
+		ArrayList<PlayerStats> topMostLHPlayers = getTop_PlayerMostLH(numResults);
+		ArrayList<PlayerStats> topMostGPMAvgPlayers = getTop_PlayerMostGPMAvg(numResults);
+		ArrayList<PlayerStats> topMostGPMPlayers = getTop_PlayerMostGPM(numResults);
+		ArrayList<PlayerStats> topMostDiffHeroesPlayers = getTop_PlayerMostDiffHeroes(numResults);
+		
+		System.out.println();
 		System.out.println("Player Stats");
+		System.out.printf("%-30s%-20s%10s%20s\n", "Category", "Player", "Result", "Match Id");
+		for (int i = 0; i < numResults; i ++){
+			PlayerStats highestKillAvgPlayer = topHighestKillAvgPlayers.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Highest Kill Avg:", highestKillAvgPlayer.getId(), highestKillAvgPlayer.getAvgKills());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", highestKillAvgPlayer.getId(), highestKillAvgPlayer.getAvgKills());
+		}	
 		
-		PlayerStats highestKillAvgPlayer = getPlayerHighestKillAvg();
-		PlayerStats mostKillsPlayer = getPlayerMostKills();
-		PlayerStats lowestDeathsAvgPlayer = getPlayerLowestDeathsAvg();
-		PlayerStats highestAssistsAvgPlayer = getPlayerHighestAssistAvg();
-		PlayerStats mostAssistsPlayer = getPlayerMostAssists();
-		PlayerStats highestLHAvgPlayer = getPlayerHighestLHAvg();
-		PlayerStats mostLHPlayer = getPlayerMostLH();
-		PlayerStats mostGPMAvgPlayer = getPlayerMostGPMAvg();
-		PlayerStats mostGPMPlayer = getPlayerMostGPM();
-		PlayerStats mostDiffHeroesPlayer = getPlayerMostDiffHeroes();
+		for (int i = 0; i < numResults; i ++){
+			PlayerStats mostKillsPlayer = topMostKillsPlayers.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d%20s\n", "Most Kills:", mostKillsPlayer.getId(), mostKillsPlayer.getMostKills(), mostKillsPlayer.getMostKills_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10d%20s\n", "", mostKillsPlayer.getId(), mostKillsPlayer.getMostKills(),mostKillsPlayer.getMostKills_MatchId());
+		}	
 		
-		System.out.printf("%-30s%-20s%10s%20s\n", "Category", "Player Id", "Result", "Match Id");
-		System.out.printf("%-30s%-20s%10.2f\n", "Highest Kill Avg:", highestKillAvgPlayer.getId(), highestKillAvgPlayer.getAvgKills());
-		System.out.printf("%-30s%-20s%10d%20s\n", "Most Kills:", mostKillsPlayer.getId(), mostKillsPlayer.getMostKills(), mostKillsPlayer.getMostKills_MatchId());
-		System.out.printf("%-30s%-20s%10.2f\n", "Lowest Deaths Avg:", lowestDeathsAvgPlayer.getId(), lowestDeathsAvgPlayer.getAvgDeaths());
-		System.out.printf("%-30s%-20s%10.2f\n", "Highest Assists Avg:", highestAssistsAvgPlayer.getId(), highestAssistsAvgPlayer.getAvgAssists());
-		System.out.printf("%-30s%-20s%10d%20s\n", "Most Assists:", mostAssistsPlayer.getId(), mostAssistsPlayer.getMostAssists(), mostAssistsPlayer.getMostAssists_MatchId());
-		System.out.printf("%-30s%-20s%10.2f\n", "Highest LH Avg:", highestLHAvgPlayer.getId(), highestLHAvgPlayer.getAvgLH());
-		System.out.printf("%-30s%-20s%10d%20s\n", "Most LH:", mostLHPlayer.getId(), mostLHPlayer.getMostLH(), mostLHPlayer.getMostLH_MatchId());
-		System.out.printf("%-30s%-20s%10.2f\n", "Highest GPM Avg:", mostGPMAvgPlayer.getId(), mostGPMAvgPlayer.getAvgGPM());
-		System.out.printf("%-30s%-20s%10d%20s\n", "Most GPM:", mostGPMPlayer.getId(), mostGPMPlayer.getMostGPM(), mostGPMPlayer.getMosGPM_MatchId());
-		System.out.printf("%-30s%-20s%10d\n", "Most Diff Heroes:", mostDiffHeroesPlayer.getId(), mostDiffHeroesPlayer.getNumHeroesPlayed());
-
-		//Team Stats
+		for (int i = 0; i < numResults; i ++){
+			PlayerStats lowestDeathsAvgPlayer = topLowestDeathsAvgPlayers.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Lowest Deaths:", lowestDeathsAvgPlayer.getId(), lowestDeathsAvgPlayer.getAvgDeaths());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", lowestDeathsAvgPlayer.getId(), lowestDeathsAvgPlayer.getAvgDeaths());
+		}	
+		
+		for (int i = 0; i < numResults; i ++){
+			PlayerStats highestAssistsAvgPlayer = topHighestAssistsAvgPlayers.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Highest Assists Avg:", highestAssistsAvgPlayer.getId(), highestAssistsAvgPlayer.getAvgAssists());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", highestAssistsAvgPlayer.getId(), highestAssistsAvgPlayer.getAvgAssists());
+		}	
+		
+		for (int i = 0; i < numResults; i ++){
+			PlayerStats mostAssistsPlayer = topMostAssistsPlayers.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d%20s\n", "Highest Assists:", mostAssistsPlayer.getId(), mostAssistsPlayer.getMostAssists(), mostAssistsPlayer.getMostAssists_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10d%20s\n", "", mostAssistsPlayer.getId(), mostAssistsPlayer.getMostAssists(), mostAssistsPlayer.getMostAssists_MatchId());
+		}	
+		
+		for (int i = 0; i < numResults; i ++){
+			PlayerStats highestLHAvgPlayer = topHighestLHAvgPlayers.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Highest LH Avg:", highestLHAvgPlayer.getId(), highestLHAvgPlayer.getAvgLH());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", highestLHAvgPlayer.getId(), highestLHAvgPlayer.getAvgLH());
+		}	
+		
+		for (int i = 0; i < numResults; i ++){
+			PlayerStats mostLHPlayer = topMostLHPlayers.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d%20s\n", "Most LH:", mostLHPlayer.getId(), mostLHPlayer.getMostLH(), mostLHPlayer.getMostLH_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10d%20s\n", "", mostLHPlayer.getId(), mostLHPlayer.getMostLH(), mostLHPlayer.getMostLH_MatchId());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			PlayerStats mostGPMAvgPlayer = topMostGPMAvgPlayers.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Most GPM Avg:", mostGPMAvgPlayer.getId(), mostGPMAvgPlayer.getAvgGPM());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", mostGPMAvgPlayer.getId(), mostGPMAvgPlayer.getAvgGPM());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			PlayerStats mostGPMPlayer = topMostGPMPlayers.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d%20s\n", "Most GPM:", mostGPMPlayer.getId(), mostGPMPlayer.getMostGPM(), mostGPMPlayer.getMostGPM_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10d%20s\n", "", mostGPMPlayer.getId(), mostGPMPlayer.getMostGPM(), mostGPMPlayer.getMostGPM_MatchId());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			PlayerStats mostDiffHeroesPlayer = topMostDiffHeroesPlayers.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d\n", "Most Diff Heroes:", mostDiffHeroesPlayer.getId(), mostDiffHeroesPlayer.getNumHeroesPlayed());
+			else 
+				System.out.printf("%-30s%-20s%10d\n", "", mostDiffHeroesPlayer.getId(), mostDiffHeroesPlayer.getNumHeroesPlayed());
+		}
+		
+		//Teams
+		ArrayList<TeamStats> topMostKillsTeams = getTop_TeamMostKills(numResults);
+		ArrayList<TeamStats> topHighestKillAvgTeams = getTop_TeamHighestKillAvg(numResults);
+		ArrayList<TeamStats> topFewestDeathsTeams = getTop_TeamFewestDeaths(numResults);
+		ArrayList<TeamStats> topMostAssistsTeams = getTop_TeamMostAssists(numResults);
+		ArrayList<TeamStats> topWinLongestGameTeams = getTop_TeamWinLongestGame(numResults);
+		ArrayList<TeamStats> topWinShortestGameTeams = getTop_TeamWinShortestGame(numResults);
+		ArrayList<TeamStats> topHighestGameLengthAvgTeams = getTop_TeamHighestGameLengthAvg(numResults);
+		ArrayList<TeamStats> topMostDiffHeroesTeams = getTop_TeamMostDiffHeroes(numResults);
+		ArrayList<TeamStats> topLeastDiffHeroesTeams = getTop_TeamLeastDiffHeroes(numResults);
+			
 		System.out.println();
-		System.out.println("Team Stats");		
-		
-		TeamStats mostKillsTeam = getTeamMostKills();
-		TeamStats highestKillAvgTeam = getTeamHighestKillAvg();
-		TeamStats fewestDeathsTeam = getTeamFewestDeaths();
-		TeamStats mostAssistsTeam = getTeamMostAssists();
-		TeamStats winLongestGameTeam = getTeamWinLongestGame();
-		TeamStats winShortestGameTeam = getTeamWinShortestGame();
-		TeamStats highestGameLengthAvgTeam = getTeamHigestGameLengthAvg();
-		TeamStats mostDiffHeroesTeam = getTeamMostDiffHeroes();
-		TeamStats leastDiffHeroesTeam = getTeamLeastDiffHeroes();
-		
+		System.out.println("Team Stats");
 		System.out.printf("%-30s%-20s%10s%20s\n", "Category", "Team", "Result", "Match Id");
-		System.out.printf("%-30s%-20s%10d%20s\n", "Most Kills:", mostKillsTeam.getName(), mostKillsTeam.getMostKills(), mostKillsTeam.getMostKills_MatchId());
-		System.out.printf("%-30s%-20s%10.2f\n", "Highest Kill Avg:", highestKillAvgTeam.getName(), highestKillAvgTeam.getAvgKills());
-		System.out.printf("%-30s%-20s%10d%20s\n", "Fewest Deaths:", fewestDeathsTeam.getName(), fewestDeathsTeam.getLeastDeaths(), fewestDeathsTeam.getLeastDeaths_MatchId());
-		System.out.printf("%-30s%-20s%10d%20s\n", "Most Assists:", mostAssistsTeam.getName(), mostAssistsTeam.getMostAssists(), mostAssistsTeam.getMostAssists_MatchId());
-		System.out.printf("%-30s%-20s%10.2f%20s\n", "Win Longest Game:", winLongestGameTeam.getName(), winLongestGameTeam.getLongestGameWon()/60, winLongestGameTeam.getLongestGameWon_MatchId());
-		System.out.printf("%-30s%-20s%10.2f%20s\n", "Win Shortest game", winShortestGameTeam.getName(), winShortestGameTeam.getShortestGameWon()/60, winShortestGameTeam.getShortestGameWon_MatchId());
-		System.out.printf("%-30s%-20s%10.2f\n", "Highest Game Length Avg:", highestGameLengthAvgTeam.getName(), highestGameLengthAvgTeam.getAvgGameLength()/60);
-		System.out.printf("%-30s%-20s%10d\n", "Most Diff Heroes:", mostDiffHeroesTeam.getName(), mostDiffHeroesTeam.getNumHeroesPicked());
-		System.out.printf("%-30s%-20s%10d\n", "Least Diff Heroes:", leastDiffHeroesTeam.getName(), leastDiffHeroesTeam.getNumHeroesPicked());
-                             
-		//Tournament Stats
-		System.out.println();
-		System.out.println("Tournament Stats");
+		for (int i = 0; i < numResults; i ++){
+			TeamStats mostKillsTeam = topMostKillsTeams.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d%20s\n", "Most Kills:", mostKillsTeam.getName(), mostKillsTeam.getMostKills(),mostKillsTeam.getMostKills_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10d%20s\n", "", mostKillsTeam.getName(), mostKillsTeam.getMostKills(),mostKillsTeam.getMostKills_MatchId());
+		}	
+		
+		for (int i = 0; i < numResults; i ++){
+			TeamStats highestKillAvgTeam = topHighestKillAvgTeams.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Highest Kill Avg:", highestKillAvgTeam.getName(), highestKillAvgTeam.getAvgKills());
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", highestKillAvgTeam.getName(), highestKillAvgTeam.getAvgKills());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			TeamStats fewestDeathsTeam = topFewestDeathsTeams.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d%20s\n", "Fewest Deaths:", fewestDeathsTeam.getName(), fewestDeathsTeam.getLeastDeaths(), fewestDeathsTeam.getLeastDeaths_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10d%20s\n", "", fewestDeathsTeam.getName(), fewestDeathsTeam.getLeastDeaths(), fewestDeathsTeam.getLeastDeaths_MatchId());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			TeamStats mostAssistsTeam = topMostAssistsTeams.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d%20s\n", "Most Assists:", mostAssistsTeam.getName(), mostAssistsTeam.getMostAssists(), mostAssistsTeam.getMostAssists_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10d%20s\n", "", mostAssistsTeam.getName(), mostAssistsTeam.getMostAssists(), mostAssistsTeam.getMostAssists_MatchId());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			TeamStats winLongestGameTeam = topWinLongestGameTeams.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f%20s\n", "Win Longest Game:", winLongestGameTeam.getName(), winLongestGameTeam.getLongestGameWon()/60, winLongestGameTeam.getLongestGameWon_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10.2f%20s\n", "", winLongestGameTeam.getName(), winLongestGameTeam.getLongestGameWon()/60, winLongestGameTeam.getLongestGameWon_MatchId());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			TeamStats winShortestGameTeam = topWinShortestGameTeams.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f%20s\n", "Win Shortest Game:", winShortestGameTeam.getName(), winShortestGameTeam.getShortestGameWon()/60, winShortestGameTeam.getShortestGameWon_MatchId());
+			else 
+				System.out.printf("%-30s%-20s%10.2f%20s\n", "", winShortestGameTeam.getName(), winShortestGameTeam.getShortestGameWon()/60, winShortestGameTeam.getShortestGameWon_MatchId());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			TeamStats highestGameLengthAvg = topHighestGameLengthAvgTeams.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10.2f\n", "Highest Game Length Avg", highestGameLengthAvg.getName(), highestGameLengthAvg.getAvgGameLength()/60);
+			else 
+				System.out.printf("%-30s%-20s%10.2f\n", "", highestGameLengthAvg.getName(), highestGameLengthAvg.getAvgGameLength()/60);
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			TeamStats mostDiffHeroesTeam = topMostDiffHeroesTeams.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d\n", "Most Diff Heroes:", mostDiffHeroesTeam.getName(), mostDiffHeroesTeam.getNumHeroesPicked());
+			else 
+				System.out.printf("%-30s%-20s%10d\n", "", mostDiffHeroesTeam.getName(), mostDiffHeroesTeam.getNumHeroesPicked());
+		}
+		
+		for (int i = 0; i < numResults; i ++){
+			TeamStats leastDiffHeroesTeam = topLeastDiffHeroesTeams.get(i);
+			if (i == 0)
+				System.out.printf("%-30s%-20s%10d\n", "Least Diff Heroes:", leastDiffHeroesTeam.getName(), leastDiffHeroesTeam.getNumHeroesPicked());
+			else 
+				System.out.printf("%-30s%-20s%10d\n", "", leastDiffHeroesTeam.getName(), leastDiffHeroesTeam.getNumHeroesPicked());
+		}
+		
+		//Tournament
 		
 		int totalGamesPlayed = getTotalGamesPlayed();
 		int totalHeroesPicked = getNumHeroesPicked();
@@ -235,10 +422,15 @@ public class CompendiumStats {
 		int mostCombinedKills = getMostCombinedKills();
 		double longestGameDuration = getLongestGameDuration();
 		double shortestGameDuration = getShortestGameDuration();
+		TeamStats winLongestGameTeam = topWinLongestGameTeams.get(0);
+		TeamStats winShortestGameTeam = topWinShortestGameTeams.get(0);
+		HeroStats mostKillsHero = topMostKillsHeroes.get(0);
 		HeroStats mostDeathsHero = getHeroMostDeaths();
 		HeroStats mostAssistsHero = getHeroMostAssists();
-		HeroStats mostGPMHero = getHeroHigestGPM();
+		HeroStats mostGPMHero = getHeroHighestGPM();
 		
+		System.out.println();
+		System.out.println("Tournament Stats");
 		System.out.printf("%-30s%10s%20s\n", "Category", "Result", "Match Id");
 		System.out.printf("%-30s%10d\n", "Total Games Played:", totalGamesPlayed);
 		System.out.printf("%-30s%10d\n", "Number of Heros Picked:", totalHeroesPicked);
@@ -252,7 +444,7 @@ public class CompendiumStats {
 		System.out.printf("%-30s%10d%20s\n", "Most GPM by Hero:", mostGPMHero.getMostGPM(), mostGPMHero.getMostGPM_MatchId());
 
 	}
-	
+
 	public boolean hasPlayer(String id){
 		if (playerStatsList == null)
 			return false;
@@ -309,175 +501,432 @@ public class CompendiumStats {
 	}
 	
 	//Heroes
-	public HeroStats getHeroMostPicked(){
-		HeroStats result = null;
-		int mostPicked = 0;
-		for (int i = 1; i < heroStatsList.length; i++){
-			if (heroStatsList[i].getNumPicked() > mostPicked){
-				mostPicked = heroStatsList[i].getNumPicked();
-				result = heroStatsList[i];
+	public ArrayList<HeroStats> getTop_HeroMostPicked(int n){
+		ArrayList<HeroStats> result = new ArrayList<HeroStats>();
+		HeroStats hero = null;
+		for (int i = 0; i < 5; i++){
+			int mostPicked = 0;
+			for (int j = 1; j < heroStatsList.length; j++){
+				if (!result.contains(heroStatsList[j]) && heroStatsList[j].getNumPicked() >= mostPicked){
+					mostPicked = heroStatsList[j].getNumPicked();
+					hero = heroStatsList[j];
+				}
 			}
+			if (hero != null)
+				result.add(hero);
 		}
 		return result;
 	}
 	
-	public HeroStats getHeroMostBanned(){
-		HeroStats result = null;
-		int mostBanned = 0;
-		for (int i = 1; i < heroStatsList.length; i++){
-			if (heroStatsList[i].getNumBanned() > mostBanned){
-				mostBanned = heroStatsList[i].getNumBanned();
-				result = heroStatsList[i];
+	public ArrayList<HeroStats> getTop_HeroMostBanned(int n){
+		ArrayList<HeroStats> result = new ArrayList<HeroStats>();
+		HeroStats hero = null;
+		for (int i = 0; i < 5; i++){
+			int mostBanned = 0;
+			for (int j = 1; j < heroStatsList.length; j++){
+				if (!result.contains(heroStatsList[j]) && heroStatsList[j].getNumBanned() >= mostBanned){
+					mostBanned = heroStatsList[j].getNumBanned();
+					hero = heroStatsList[j];
+				}
 			}
+			if (hero != null)
+				result.add(hero);
 		}
 		return result;
 	}
 	
-	public HeroStats getHeroHighestWR(){
-		HeroStats result = null;
-		double highestWR = 0;
-		for (int i = 1; i < heroStatsList.length; i++){
-			if (heroStatsList[i].getWinrate() > highestWR && heroStatsList[i].getNumPicked() >= numMinimumGamesPlayed){
-				highestWR = heroStatsList[i].getWinrate();
-				result = heroStatsList[i];
+	
+	
+	public ArrayList<HeroStats> getTop_HeroHighestWR(int n, int numMinimumGamesPlayed){
+		ArrayList<HeroStats> result = new ArrayList<HeroStats>();
+		HeroStats hero = null;
+		for (int i = 0; i < 5; i++){
+			double highestWR = 0;
+			for (int j = 1; j < heroStatsList.length; j++){
+				if (!result.contains(heroStatsList[j]) && heroStatsList[j].getWinrate() >= highestWR && heroStatsList[j].getNumPicked() >= numMinimumGamesPlayed){
+					highestWR = heroStatsList[j].getWinrate();
+					hero = heroStatsList[j];
+				}
 			}
+			if (hero != null)
+				result.add(hero);
+		}
+		return result;
+	}
+
+	public ArrayList<HeroStats> getTop_HeroHighestKillAvg(int n, int numMinimumGamesPlayed){
+		ArrayList<HeroStats> result = new ArrayList<HeroStats>();
+		HeroStats hero = null;
+		for (int i = 0; i < 5; i++){
+			double highestKillAvg = 0;
+			for (int j = 1; j < heroStatsList.length; j++){
+				if (!result.contains(heroStatsList[j]) && heroStatsList[j].getAvgKills() >= highestKillAvg && heroStatsList[j].getNumPicked() >= numMinimumGamesPlayed){
+					highestKillAvg = heroStatsList[j].getAvgKills();
+					hero = heroStatsList[j];
+				}
+			}
+			if (hero != null)
+				result.add(hero);
 		}
 		return result;
 	}
 	
-	public HeroStats getHeroHighestKillAvg(){
-		HeroStats result = null;
-		double highestKillAvg = 0;
-		for (int i = 1; i < heroStatsList.length; i++){
-			if (heroStatsList[i].getAvgKill() > highestKillAvg && heroStatsList[i].getNumPicked() >= numMinimumGamesPlayed){
-				highestKillAvg = heroStatsList[i].getAvgKill();
-				result = heroStatsList[i];
+	public ArrayList<HeroStats> getTop_HeroHighestAssistAvg(int n, int numMinimumGamesPlayed){
+		ArrayList<HeroStats> result = new ArrayList<HeroStats>();
+		HeroStats hero = null;
+		for (int i = 0; i < 5; i++){
+			double highestAssistAvg = 0;
+			for (int j = 1; j < heroStatsList.length; j++){
+				if (!result.contains(heroStatsList[j]) && heroStatsList[j].getAvgAssists() >= highestAssistAvg && heroStatsList[j].getNumPicked() >= numMinimumGamesPlayed){
+					highestAssistAvg = heroStatsList[j].getAvgAssists();
+					hero = heroStatsList[j];
+				}
 			}
+			if (hero != null)
+				result.add(hero);
 		}
 		return result;
 	}
 	
-	public HeroStats getHeroHighestAssistAvg(){
-		HeroStats result = null;
-		double highestAssistAvg = 0;
-		for (int i = 1; i < heroStatsList.length; i++){
-			if (heroStatsList[i].getAvgAssist() > highestAssistAvg && heroStatsList[i].getNumPicked() >= numMinimumGamesPlayed){
-				highestAssistAvg = heroStatsList[i].getAvgAssist();
-				result = heroStatsList[i];
+	public ArrayList<HeroStats> getTop_HeroLeastDeathAvg(int n, int numMinimumGamesPlayed){
+		ArrayList<HeroStats> result = new ArrayList<HeroStats>();
+		HeroStats hero = null;
+		for (int i = 0; i < 5; i++){
+			double lowestDeathAvg = Integer.MAX_VALUE;
+			for (int j = 1; j < heroStatsList.length; j++){
+				if (!result.contains(heroStatsList[j]) && heroStatsList[j].getAvgDeaths() <= lowestDeathAvg && heroStatsList[j].getNumPicked() >= numMinimumGamesPlayed){
+					lowestDeathAvg = heroStatsList[j].getAvgDeaths();
+					hero = heroStatsList[j];
+				}
 			}
+			if (hero != null)
+				result.add(hero);
+		}
+		return result;
+	}
+
+	public ArrayList<HeroStats> getTop_HeroHighestLHAvg(int n, int numMinimumGamesPlayed){
+		ArrayList<HeroStats> result = new ArrayList<HeroStats>();
+		HeroStats hero = null;
+		for (int i = 0; i < 5; i++){
+			double highestLHAvg = 0;
+			for (int j = 1; j < heroStatsList.length; j++){
+				if (!result.contains(heroStatsList[j]) && heroStatsList[j].getAvgLH() >= highestLHAvg && heroStatsList[j].getNumPicked() >= numMinimumGamesPlayed){
+					highestLHAvg = heroStatsList[j].getAvgLH();
+					hero = heroStatsList[j];
+				}
+			}
+			if (hero != null)
+				result.add(hero);
+		}
+		return result;
+	}
+		
+	public ArrayList<HeroStats> getTop_HeroHighesGPMAvg(int n, int numMinimumGamesPlayed){
+		ArrayList<HeroStats> result = new ArrayList<HeroStats>();
+		HeroStats hero = null;
+		for (int i = 0; i < 5; i++){
+			double highestGPMAvg = 0;
+			for (int j = 1; j < heroStatsList.length; j++){
+				if (!result.contains(heroStatsList[j]) && heroStatsList[j].getAvgGPM() >= highestGPMAvg && heroStatsList[j].getNumPicked() >= numMinimumGamesPlayed){
+					highestGPMAvg = heroStatsList[j].getAvgGPM();
+					hero = heroStatsList[j];
+				}
+			}
+			if (hero != null)
+				result.add(hero);
+		}
+		return result;
+	}
+
+	public ArrayList<HeroStats> getTop_HeroMostKills(int n){
+		ArrayList<HeroStats> result = new ArrayList<HeroStats>();
+		HeroStats hero = null;
+		for (int i = 0; i < 5; i++){
+			int mostKills = 0;
+			for (int j = 1; j < heroStatsList.length; j++){
+				if (!result.contains(heroStatsList[j]) && heroStatsList[j].getMostKills() >= mostKills){
+					mostKills = heroStatsList[j].getMostKills();
+					hero = heroStatsList[j];
+				}
+			}
+			if (hero != null)
+				result.add(hero);
 		}
 		return result;
 	}
 	
-	public HeroStats getHeroLeastDeathAvg(){
-		HeroStats result = null;
-		double lowestDeathAvg = Integer.MAX_VALUE;
-		for (int i = 1; i < heroStatsList.length; i++){
-			if (heroStatsList[i].getAvgDeath() < lowestDeathAvg && heroStatsList[i].getNumPicked() >= numMinimumGamesPlayed){
-				lowestDeathAvg = heroStatsList[i].getAvgDeath();
-				result = heroStatsList[i];
+	public ArrayList<HeroStats> getTop_HeroMostLH(int n){
+		ArrayList<HeroStats> result = new ArrayList<HeroStats>();
+		HeroStats hero = null;
+		for (int i = 0; i < 5; i++){
+			int mostLH = 0;
+			for (int j = 1; j < heroStatsList.length; j++){
+				if (!result.contains(heroStatsList[j]) && heroStatsList[j].getMostLH() >= mostLH){
+					mostLH = heroStatsList[j].getMostLH();
+					hero = heroStatsList[j];
+				}
 			}
+			if (hero != null)
+				result.add(hero);
 		}
 		return result;
 	}
 	
-	public HeroStats getHeroHighestLHAvg(){
-		HeroStats result = null;
-		double highestLHAvg = 0;
-		for (int i = 1; i < heroStatsList.length; i++){
-			if (heroStatsList[i].getAvgLH() > highestLHAvg && heroStatsList[i].getNumPicked() >= numMinimumGamesPlayed){
-				highestLHAvg = heroStatsList[i].getAvgLH();
-				result = heroStatsList[i];
+	
+	//Player
+	public ArrayList<PlayerStats> getTop_PlayerHighestKillAvg(int n){
+		ArrayList<PlayerStats> result = new ArrayList<PlayerStats>();
+		PlayerStats player = null;
+		for (int i = 0; i < 5; i++){
+			double highestKillAvg = 0;
+			for (int j = 1; j < playerStatsList.size(); j++){
+				if (!result.contains(playerStatsList.get(j)) && playerStatsList.get(j).getAvgKills() >= highestKillAvg){
+					highestKillAvg = playerStatsList.get(j).getAvgKills();
+					player = playerStatsList.get(j);
+				}
 			}
+			if (player != null)
+				result.add(player);
 		}
 		return result;
 	}
 	
-	public HeroStats getHeroHighestGPMAvg(){
-		HeroStats result = null;
-		double highestGPMAvg = 0;
-		for (int i = 1; i < heroStatsList.length; i++){
-			if (heroStatsList[i].getAvgGPM() > highestGPMAvg && heroStatsList[i].getNumPicked() >= numMinimumGamesPlayed){
-				highestGPMAvg = heroStatsList[i].getAvgGPM();
-				result = heroStatsList[i];
+	public ArrayList<PlayerStats> getTop_PlayerMostKills(int n){
+		ArrayList<PlayerStats> result = new ArrayList<PlayerStats>();
+		PlayerStats player = null;
+		for (int i = 0; i < 5; i++){
+			int mostKills = 0;
+			for (int j = 1; j < playerStatsList.size(); j++){
+				if (!result.contains(playerStatsList.get(j)) && playerStatsList.get(j).getMostKills() >= mostKills){
+					mostKills = playerStatsList.get(j).getMostKills();
+					player = playerStatsList.get(j);
+				}
 			}
+			if (player != null)
+				result.add(player);
 		}
 		return result;
 	}
 	
-	public HeroStats getHeroMostKills(){
-		HeroStats result = null;
-		int mostKills = 0;
-		for (int i = 1; i < heroStatsList.length; i++){
-			if (heroStatsList[i].getMostKills() > mostKills){
-				mostKills = heroStatsList[i].getMostKills();
-				result = heroStatsList[i];
+	public ArrayList<PlayerStats> getTop_PlayerLowestDeathsAvg(int n){
+		ArrayList<PlayerStats> result = new ArrayList<PlayerStats>();
+		PlayerStats player = null;
+		for (int i = 0; i < 5; i++){
+			double lowestDeathAvg = Double.MAX_VALUE;
+			for (int j = 1; j < playerStatsList.size(); j++){
+				if (!result.contains(playerStatsList.get(j)) && playerStatsList.get(j).getAvgDeaths() <= lowestDeathAvg){
+					lowestDeathAvg = playerStatsList.get(j).getAvgDeaths();
+					player = playerStatsList.get(j);
+				}
 			}
+			if (player != null)
+				result.add(player);
 		}
 		return result;
 	}
 	
-	public HeroStats getHeroMostLH(){
-		HeroStats result = null;
-		int mostLH = 0;
-		for (int i = 1; i < heroStatsList.length; i++){
-			if (heroStatsList[i].getMostLH() > mostLH){
-				mostLH = heroStatsList[i].getMostLH();
-				result = heroStatsList[i];
+	public ArrayList<PlayerStats> getTop_PlayerHighestAssistsAvg(int n){
+		ArrayList<PlayerStats> result = new ArrayList<PlayerStats>();
+		PlayerStats player = null;
+		for (int i = 0; i < 5; i++){
+			double highestAssistAvg = 0;
+			for (int j = 1; j < playerStatsList.size(); j++){
+				if (!result.contains(playerStatsList.get(j)) && playerStatsList.get(j).getAvgAssists() >= highestAssistAvg){
+					highestAssistAvg = playerStatsList.get(j).getAvgAssists();
+					player = playerStatsList.get(j);
+				}
 			}
+			if (player != null)
+				result.add(player);
+		}
+		return result;
+	}
+
+	public ArrayList<PlayerStats> getTop_PlayerMostAssists(int n){
+		ArrayList<PlayerStats> result = new ArrayList<PlayerStats>();
+		PlayerStats player = null;
+		for (int i = 0; i < 5; i++){
+			int highestAssist = 0;
+			for (int j = 1; j < playerStatsList.size(); j++){
+				if (!result.contains(playerStatsList.get(j)) && playerStatsList.get(j).getMostAssists() >= highestAssist){
+					highestAssist = playerStatsList.get(j).getMostAssists();
+					player = playerStatsList.get(j);
+				}
+			}
+			if (player != null)
+				result.add(player);
+		}
+		return result;
+	}
+
+	public ArrayList<PlayerStats> getTop_PlayerHighestLHAvg(int n){
+		ArrayList<PlayerStats> result = new ArrayList<PlayerStats>();
+		PlayerStats player = null;
+		for (int i = 0; i < 5; i++){
+			double highestLHAvg = 0;
+			for (int j = 1; j < playerStatsList.size(); j++){
+				if (!result.contains(playerStatsList.get(j)) && playerStatsList.get(j).getAvgLH() >= highestLHAvg){
+					highestLHAvg = playerStatsList.get(j).getAvgLH();
+					player = playerStatsList.get(j);
+				}
+			}
+			if (player != null)
+				result.add(player);
+		}
+		return result;
+	}
+
+	public ArrayList<PlayerStats> getTop_PlayerMostLH(int n){
+		ArrayList<PlayerStats> result = new ArrayList<PlayerStats>();
+		PlayerStats player = null;
+		for (int i = 0; i < 5; i++){
+			int mostLH = 0;
+			for (int j = 1; j < playerStatsList.size(); j++){
+				if (!result.contains(playerStatsList.get(j)) && playerStatsList.get(j).getMostLH() >= mostLH){
+					mostLH = playerStatsList.get(j).getMostLH();
+					player = playerStatsList.get(j);
+				}
+			}
+			if (player != null)
+				result.add(player);
+		}
+		return result;
+	}
+
+	public ArrayList<PlayerStats> getTop_PlayerMostGPM(int n){
+		ArrayList<PlayerStats> result = new ArrayList<PlayerStats>();
+		PlayerStats player = null;
+		for (int i = 0; i < 5; i++){
+			int mostGPM = 0;
+			for (int j = 1; j < playerStatsList.size(); j++){
+				if (!result.contains(playerStatsList.get(j)) && playerStatsList.get(j).getMostGPM() >= mostGPM){
+					mostGPM = playerStatsList.get(j).getMostGPM();
+					player = playerStatsList.get(j);
+				}
+			}
+			if (player != null)
+				result.add(player);
+		}
+		return result;
+	}
+
+	public ArrayList<PlayerStats> getTop_PlayerMostGPMAvg(int n){
+		ArrayList<PlayerStats> result = new ArrayList<PlayerStats>();
+		PlayerStats player = null;
+		for (int i = 0; i < 5; i++){
+			double mostGPMAvg = 0;
+			for (int j = 1; j < playerStatsList.size(); j++){
+				if (!result.contains(playerStatsList.get(j)) && playerStatsList.get(j).getAvgGPM() >= mostGPMAvg){
+					mostGPMAvg = playerStatsList.get(j).getAvgGPM();
+					player = playerStatsList.get(j);
+				}
+			}
+			if (player != null)
+				result.add(player);
+		}
+		return result;
+	}
+	
+	public ArrayList<PlayerStats> getTop_PlayerMostDiffHeroes(int n){
+		ArrayList<PlayerStats> result = new ArrayList<PlayerStats>();
+		PlayerStats player = null;
+		for (int i = 0; i < 5; i++){
+			int mostDiffHeroes = 0;
+			for (int j = 1; j < playerStatsList.size(); j++){
+				if (!result.contains(playerStatsList.get(j)) && playerStatsList.get(j).getNumHeroesPlayed() >= mostDiffHeroes){
+					mostDiffHeroes = playerStatsList.get(j).getNumHeroesPlayed();
+					player = playerStatsList.get(j);
+				}
+			}
+			if (player != null)
+				result.add(player);
 		}
 		return result;
 	}
 	
 	//Team
-	public String getTeamWinner(){
-		return null;
-	}
-	
-	public TeamStats getTeamMostKills(){
-		TeamStats result = null;
-		int mostKills = 0;
-		for (int i = 0; i < teamStatsList.size(); i++){
-			if (teamStatsList.get(i).getMostKills() > mostKills){
-				mostKills = teamStatsList.get(i).getMostKills();
-				result = teamStatsList.get(i);
+	public ArrayList<TeamStats> getTop_TeamMostKills(int n){
+		ArrayList<TeamStats> result = new ArrayList<TeamStats>();
+		TeamStats team = null;
+		for (int i = 0; i < 5; i++){
+			int mostKills = 0;
+			for (int j = 0; j < teamStatsList.size(); j++){
+				if (!result.contains(teamStatsList.get(j)) && teamStatsList.get(j).getMostKills() >= mostKills){
+					mostKills = teamStatsList.get(j).getMostKills();
+					team = teamStatsList.get(j);
+				}
 			}
+			if (team != null)
+				result.add(team);
 		}
 		return result;
 	}
-	
-	public TeamStats getTeamHighestKillAvg(){
-		TeamStats result = null;
-		double highestKillAvg = 0;
-		for (int i = 0; i < teamStatsList.size(); i++){
-			if (teamStatsList.get(i).getAvgKills() > highestKillAvg){
-				highestKillAvg = teamStatsList.get(i).getAvgKills();
-				result = teamStatsList.get(i);
+		
+	public ArrayList<TeamStats> getTop_TeamHighestKillsAvg(int n){
+		ArrayList<TeamStats> result = new ArrayList<TeamStats>();
+		TeamStats team = null;
+		for (int i = 0; i < 5; i++){
+			double highestKillAvg = 0;
+			for (int j = 0; j < teamStatsList.size(); j++){
+				if (!result.contains(teamStatsList.get(j)) && teamStatsList.get(j).getAvgKills() >= highestKillAvg){
+					highestKillAvg = teamStatsList.get(j).getAvgKills();
+					team = teamStatsList.get(j);
+				}
 			}
+			if (team != null)
+				result.add(team);
 		}
 		return result;
 	}
-	
-	public TeamStats getTeamFewestDeaths(){
-		TeamStats result = null;
-		int fewestDeath = Integer.MAX_VALUE;
-		for (int i = 0; i < teamStatsList.size(); i++){
-			if (teamStatsList.get(i).getLeastDeaths() < fewestDeath){
-				fewestDeath = teamStatsList.get(i).getLeastDeaths();
-				result = teamStatsList.get(i);
+		
+	public ArrayList<TeamStats> getTop_TeamHighestKillAvg(int n){
+		ArrayList<TeamStats> result = new ArrayList<TeamStats>();
+		TeamStats team = null;
+		for (int i = 0; i < 5; i++){
+			double highestKillAvg = 0;
+			for (int j = 0; j < teamStatsList.size(); j++){
+				if (!result.contains(teamStatsList.get(j)) && teamStatsList.get(j).getAvgKills() >= highestKillAvg){
+					highestKillAvg = teamStatsList.get(j).getAvgKills();
+					team = teamStatsList.get(j);
+				}
 			}
+			if (team != null)
+				result.add(team);
 		}
 		return result;
 	}
-	
-	public TeamStats getTeamMostAssists(){
-		TeamStats result = null;
-		int mostAssists = 0;
-		for (int i = 0; i < teamStatsList.size(); i++){
-			if (teamStatsList.get(i).getMostAssists() > mostAssists){
-				mostAssists = teamStatsList.get(i).getMostAssists();
-				result = teamStatsList.get(i);
+		
+	public ArrayList<TeamStats> getTop_TeamFewestDeaths(int n){
+		ArrayList<TeamStats> result = new ArrayList<TeamStats>();
+		TeamStats team = null;
+		for (int i = 0; i < 5; i++){
+			int fewestDeath = Integer.MAX_VALUE;
+			for (int j = 0; j < teamStatsList.size(); j++){
+				if (!result.contains(teamStatsList.get(j)) && teamStatsList.get(j).getLeastDeaths() <= fewestDeath){
+					fewestDeath = teamStatsList.get(j).getLeastDeaths();
+					team = teamStatsList.get(j);
+				}
 			}
+			if (team != null)
+				result.add(team);
+		}
+		return result;
+	}
+
+	public ArrayList<TeamStats> getTop_TeamMostAssists(int n){
+		ArrayList<TeamStats> result = new ArrayList<TeamStats>();
+		TeamStats team = null;
+		for (int i = 0; i < 5; i++){
+			int mostAssists = 0;
+			for (int j = 0; j < teamStatsList.size(); j++){
+				if (!result.contains(teamStatsList.get(j)) && teamStatsList.get(j).getMostAssists() >= mostAssists){
+					mostAssists = teamStatsList.get(j).getMostAssists();
+					team = teamStatsList.get(j);
+				}
+			}
+			if (team != null)
+				result.add(team);
 		}
 		return result;
 	}
@@ -494,9 +943,26 @@ public class CompendiumStats {
 		return result;
 	}
 	
+	public ArrayList<TeamStats> getTop_TeamWinLongestGame(int n){
+		ArrayList<TeamStats> result = new ArrayList<TeamStats>();
+		TeamStats team = null;
+		for (int i = 0; i < 5; i++){
+			double winLongestGame = 0;
+			for (int j = 0; j < teamStatsList.size(); j++){
+				if (!result.contains(teamStatsList.get(j)) && teamStatsList.get(j).getLongestGameWon() >= winLongestGame){
+					winLongestGame = teamStatsList.get(j).getLongestGameWon();
+					team = teamStatsList.get(j);
+				}
+			}
+			if (team != null)
+				result.add(team);
+		}
+		return result;
+	}
+	
 	public TeamStats getTeamWinShortestGame(){
 		TeamStats result = null;
-		double winShortestGame = 9999;
+		double winShortestGame = Double.MAX_VALUE;
 		for (int i = 0; i < teamStatsList.size(); i++){
 			if (teamStatsList.get(i).getShortestGameWon() < winShortestGame){
 				winShortestGame = teamStatsList.get(i).getShortestGameWon();
@@ -506,163 +972,74 @@ public class CompendiumStats {
 		return result;
 	}
 	
-	public TeamStats getTeamHigestGameLengthAvg(){
-		TeamStats result = null;
-		double highestGameLengthAvg = 0;
-		for (int i = 0; i < teamStatsList.size(); i++){
-			if (teamStatsList.get(i).getAvgGameLength() > highestGameLengthAvg){
-				highestGameLengthAvg = teamStatsList.get(i).getAvgGameLength();
-				result = teamStatsList.get(i);
+	public ArrayList<TeamStats> getTop_TeamWinShortestGame(int n){
+		ArrayList<TeamStats> result = new ArrayList<TeamStats>();
+		TeamStats team = null;
+		for (int i = 0; i < 5; i++){
+			double winShortestGame = Double.MAX_VALUE;
+			for (int j = 0; j < teamStatsList.size(); j++){
+				if (!result.contains(teamStatsList.get(j)) && teamStatsList.get(j).getShortestGameWon() <= winShortestGame){
+					winShortestGame = teamStatsList.get(j).getShortestGameWon();
+					team = teamStatsList.get(j);
+				}
 			}
+			if (team != null)
+				result.add(team);
 		}
 		return result;
 	}
-	
-	public TeamStats getTeamMostDiffHeroes(){
-		TeamStats result = null;
-		int mostDiffHeroes = 0;
-		for (int i = 0; i < teamStatsList.size(); i++){
-			if (teamStatsList.get(i).getNumHeroesPicked() > mostDiffHeroes){
-				mostDiffHeroes = teamStatsList.get(i).getNumHeroesPicked();
-				result = teamStatsList.get(i);
+
+	public ArrayList<TeamStats> getTop_TeamHighestGameLengthAvg(int n){
+		ArrayList<TeamStats> result = new ArrayList<TeamStats>();
+		TeamStats team = null;
+		for (int i = 0; i < 5; i++){
+			double highestGameLengthAvg = 0;
+			for (int j = 0; j < teamStatsList.size(); j++){
+				if (!result.contains(teamStatsList.get(j)) && teamStatsList.get(j).getAvgGameLength() >= highestGameLengthAvg){
+					highestGameLengthAvg = teamStatsList.get(j).getAvgGameLength();
+					team = teamStatsList.get(j);
+				}
 			}
+			if (team != null)
+				result.add(team);
 		}
 		return result;
 	}
-	
-	public TeamStats getTeamLeastDiffHeroes(){
-		TeamStats result = null;
-		int leastDiffHeroes = Integer.MAX_VALUE;
-		for (int i = 0; i < teamStatsList.size(); i++){
-			if (teamStatsList.get(i).getNumHeroesPicked() < leastDiffHeroes){
-				leastDiffHeroes = teamStatsList.get(i).getNumHeroesPicked();
-				result = teamStatsList.get(i);
+
+	public ArrayList<TeamStats> getTop_TeamMostDiffHeroes(int n){
+		ArrayList<TeamStats> result = new ArrayList<TeamStats>();
+		TeamStats team = null;
+		for (int i = 0; i < 5; i++){
+			int mostDiffHeroes = 0;
+			for (int j = 0; j < teamStatsList.size(); j++){
+				if (!result.contains(teamStatsList.get(j)) && teamStatsList.get(j).getNumHeroesPicked() >= mostDiffHeroes){
+					mostDiffHeroes = teamStatsList.get(j).getNumHeroesPicked();
+					team = teamStatsList.get(j);
+				}
 			}
+			if (team != null)
+				result.add(team);
 		}
 		return result;
 	}
-	
-	//Player
-	public PlayerStats getPlayerHighestKillAvg(){
-		PlayerStats result = null;
-		double highestKillAvg = 0;
-		for (int i = 0; i < playerStatsList.size(); i++){
-			if (playerStatsList.get(i).getAvgKills() > highestKillAvg){
-				highestKillAvg = playerStatsList.get(i).getAvgKills();
-				result = playerStatsList.get(i);
+
+	public ArrayList<TeamStats> getTop_TeamLeastDiffHeroes(int n){
+		ArrayList<TeamStats> result = new ArrayList<TeamStats>();
+		TeamStats team = null;
+		for (int i = 0; i < 5; i++){
+			int leastDiffHeroes = Integer.MAX_VALUE;
+			for (int j = 0; j < teamStatsList.size(); j++){
+				if (!result.contains(teamStatsList.get(j)) && teamStatsList.get(j).getNumHeroesPicked() <= leastDiffHeroes){
+					leastDiffHeroes = teamStatsList.get(j).getNumHeroesPicked();
+					team = teamStatsList.get(j);
+				}
 			}
+			if (team != null)
+				result.add(team);
 		}
 		return result;
 	}
-	
-	public PlayerStats getPlayerMostKills(){
-		PlayerStats result = null;
-		int mostKills = 0;
-		for (int i = 0; i < playerStatsList.size(); i++){
-			if (playerStatsList.get(i).getMostKills() > mostKills){
-				mostKills = playerStatsList.get(i).getMostKills();
-				result = playerStatsList.get(i);
-			}
-		}
-		return result;
-	}
-	
-	public PlayerStats getPlayerLowestDeathsAvg(){
-		PlayerStats result = null;
-		double lowestDeathAvg = Double.MAX_VALUE;
-		for (int i = 0; i < playerStatsList.size(); i++){
-			if (playerStatsList.get(i).getAvgDeaths() < lowestDeathAvg){
-				lowestDeathAvg = playerStatsList.get(i).getAvgDeaths();
-				result = playerStatsList.get(i);
-			}
-		}
-		return result;
-	}
-	
-	public PlayerStats getPlayerHighestAssistAvg(){
-		PlayerStats result = null;
-		double highestAssistAvg = 0;
-		for (int i = 0; i < playerStatsList.size(); i++){
-			if (playerStatsList.get(i).getAvgAssists() > highestAssistAvg){
-				highestAssistAvg = playerStatsList.get(i).getAvgAssists();
-				result = playerStatsList.get(i);
-			}
-		}
-		return result;
-	}
-	
-	public PlayerStats getPlayerMostAssists(){
-		PlayerStats result = null;
-		int highestAssist = 0;
-		for (int i = 0; i < playerStatsList.size(); i++){
-			if (playerStatsList.get(i).getMostAssists() > highestAssist){
-				highestAssist = playerStatsList.get(i).getMostAssists();
-				result = playerStatsList.get(i);
-			}
-		}
-		return result;
-	}
-	
-	public PlayerStats getPlayerHighestLHAvg(){
-		PlayerStats result = null;
-		double highestLHAvg = 0;
-		for (int i = 0; i < playerStatsList.size(); i++){
-			if (playerStatsList.get(i).getAvgLH() > highestLHAvg){
-				highestLHAvg = playerStatsList.get(i).getAvgLH();
-				result = playerStatsList.get(i);
-			}
-		}
-		return result;	
-	}
-	
-	public PlayerStats getPlayerMostLH(){
-		PlayerStats result = null;
-		int mostLH = 0;
-		for (int i = 0; i < playerStatsList.size(); i++){
-			if (playerStatsList.get(i).getMostLH() > mostLH){
-				mostLH = playerStatsList.get(i).getMostLH();
-				result = playerStatsList.get(i);
-			}
-		}
-		return result;	
-	}
-	
-	public PlayerStats getPlayerMostGPM(){
-		PlayerStats result = null;
-		int mostGPM = 0;
-		for (int i = 0; i < playerStatsList.size(); i++){
-			if (playerStatsList.get(i).getMostGPM() > mostGPM){
-				mostGPM = playerStatsList.get(i).getMostGPM();
-				result = playerStatsList.get(i);
-			}
-		}
-		return result;
-	}
-	
-	public PlayerStats getPlayerMostGPMAvg(){
-		PlayerStats result = null;
-		double mostGPMAvg = 0;
-		for (int i = 0; i < playerStatsList.size(); i++){
-			if (playerStatsList.get(i).getAvgGPM() > mostGPMAvg){
-				mostGPMAvg = playerStatsList.get(i).getAvgGPM();
-				result = playerStatsList.get(i);
-			}
-		}
-		return result;
-	}
-	
-	public PlayerStats getPlayerMostDiffHeroes(){
-		PlayerStats result = null;
-		int mostDiffHeroes = 0;
-		for (int i = 0; i < playerStatsList.size(); i++){
-			if (playerStatsList.get(i).getNumHeroesPlayed() > mostDiffHeroes){
-				mostDiffHeroes = playerStatsList.get(i).getNumHeroesPlayed();
-				result = playerStatsList.get(i);
-			}
-		}
-		return result;
-	}
-	
+		
 	//Tournament
 	public int getTotalGamesPlayed(){
 		return numGames;
@@ -699,8 +1076,6 @@ public class CompendiumStats {
 		return getTeamWinShortestGame().getShortestGameWon();
 	}
 	
-	//get hero with most kills, return most kills
-	
 	public HeroStats getHeroMostDeaths(){
 		HeroStats result = null;
 		int mostDeaths = 0;
@@ -725,7 +1100,7 @@ public class CompendiumStats {
 		return result;
 	}
 	
-	public HeroStats getHeroHigestGPM(){
+	public HeroStats getHeroHighestGPM(){
 		HeroStats result = null;
 		int mostGPM = 0;
 		for (int i = 1; i < heroStatsList.length; i++){

@@ -90,21 +90,21 @@ public class HeroStats {
 			return (double)numGamesWon/numPicked;
 	}
 
-	public double getAvgKill() {
+	public double getAvgKills() {
 		if (numPicked == 0)
 			return 0;
 		else 
 			return (double)totalKills/numPicked;
 	}
 	
-	public double getAvgAssist() {
+	public double getAvgAssists() {
 		if (numPicked == 0)
 			return 0;
 		else 
 			return (double)totalAssists/numPicked;
 	}
 
-	public double getAvgDeath() {
+	public double getAvgDeaths() {
 		if (numPicked == 0)
 			return Integer.MAX_VALUE;
 		else 

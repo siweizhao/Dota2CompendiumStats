@@ -136,7 +136,7 @@ public class PlayerStats {
 		return mostAssists_MatchId;
 	}
 	
-	public String getMosGPM_MatchId() {
+	public String getMostGPM_MatchId() {
 		return mostGPM_MatchId;
 	}
 	

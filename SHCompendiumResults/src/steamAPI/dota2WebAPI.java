@@ -20,9 +20,9 @@ public class dota2WebAPI {
 	String webAPIKey;
 	CompendiumStats compendium;
 	
-	public dota2WebAPI(String webAPIKey, int numMinimumGamesPlayed) throws Exception{
+	public dota2WebAPI(String webAPIKey) throws Exception{
 		this.webAPIKey = webAPIKey;
-		this.compendium = new CompendiumStats(createHeroList(), numMinimumGamesPlayed);
+		this.compendium = new CompendiumStats(createHeroList());
 	}
 	
 	public JsonObject getJsonObj(URL url) throws Exception{
@@ -74,25 +74,23 @@ public class dota2WebAPI {
 					parseMatchDetails(match_id);
 			}
 		}
-		compendium.printTournamentStats();
-		
 	}
 	
 	public static void main(String[] args) throws Exception{
 
 		String webAPIKey = args[0];
 		String leagueId = args[1];
+		int numMinimumGamesPlayed = Integer.parseInt(args[2]);
+		int numResults = Integer.parseInt(args[3]);
 		String startDate = DEFAULT_START_DATE;
-		int numMinimumGamesPlayed = 1;
+		
 		//Optional start date for matches
-		if (args.length >= 2){
-			startDate = args[2];
+		if (args.length >= 5){
+			startDate = args[4];
 		}
-		if (args.length >= 3){
-			numMinimumGamesPlayed = Integer.parseInt(args[3]);
-		}
-
-		dota2WebAPI webAPI = new dota2WebAPI(webAPIKey, numMinimumGamesPlayed);
+		
+		dota2WebAPI webAPI = new dota2WebAPI(webAPIKey);
 		webAPI.getMatchHistory(leagueId, startDate);
+		webAPI.compendium.printTournamentStats_Top(numMinimumGamesPlayed, numResults);
 	}
 }
