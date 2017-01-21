@@ -110,7 +110,7 @@ public class Compendium {
 	private void printTeamFewestDeaths(){
 		List<TeamDetail> list = collector.getTeamMostX();
 		List<TeamDetail> sortedList = processor.processFewestDeaths(list);
-		printer.printTeamDeaths(sortedList, "Most Assists:");
+		printer.printTeamDeaths(sortedList, "Fewest Deaths:");
 	}
 	
 	private void printTeamWinLongestGame(){

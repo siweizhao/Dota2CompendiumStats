@@ -1,9 +1,11 @@
 package compendium.stats;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class ProcessData {
@@ -15,14 +17,14 @@ public class ProcessData {
 
 	public List<PlayerDetail> processKills(List<PlayerDetail> list) {
 		return list.stream()
-			.sorted((e1, e2) -> e2.getKills() - e1.getKills())
+			.sorted(Comparator.comparing(PlayerDetail::getKills).reversed())
 			.limit(numResults)
 			.collect(Collectors.toList());
 	}
 	
 	public List<PlayerDetail> processLH(List<PlayerDetail> list) {
 		return list.stream()
-			.sorted((e1, e2) -> e2.getLH() - e1.getLH())
+			.sorted(Comparator.comparing(PlayerDetail::getLH).reversed())
 			.limit(numResults)
 			.collect(Collectors.toList());
 	}
@@ -37,7 +39,7 @@ public class ProcessData {
 
 	public List<TeamDetail> processMostTeamKills(List<TeamDetail> list) {
 		return list.stream()
-				.sorted((e1, e2) -> e2.getKills() - e1.getKills())
+				.sorted(Comparator.comparing(TeamDetail::getKills).reversed())
 				.limit(numResults)
 				.collect(Collectors.toList());
 	}
@@ -45,7 +47,7 @@ public class ProcessData {
 	public Map<String, Double> processStringDoubleMap(Map<String, Double> map) {
 		Map<String, Double> orderedMap = new LinkedHashMap<>();  
 		map.entrySet().stream()
-			.sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+			.sorted(Entry.comparingByValue(Comparator.reverseOrder()))
 			.limit(numResults)
 			.forEachOrdered(e -> orderedMap.put(e.getKey(), e.getValue()));
 		return orderedMap;
@@ -54,7 +56,7 @@ public class ProcessData {
 	public Map<String, Long> processStringLongMap(Map<String, Long> map) {
 		Map<String, Long> orderedMap = new LinkedHashMap<>();  
 		map.entrySet().stream()
-			.sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+			.sorted(Entry.comparingByValue(Comparator.reverseOrder()))
 			.limit(numResults)
 			.forEachOrdered(e -> orderedMap.put(e.getKey(), e.getValue()));
 		return orderedMap;
@@ -64,7 +66,7 @@ public class ProcessData {
 			Map<String, Double> map) {
 		Map<String, Double> orderedMap = new LinkedHashMap<>();  
 		map.entrySet().stream()
-			.sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+			.sorted(Entry.comparingByValue())
 			.limit(numResults)
 			.forEachOrdered(e -> orderedMap.put(e.getKey(), e.getValue()));
 		return orderedMap;
@@ -72,14 +74,14 @@ public class ProcessData {
 
 	public List<TeamDetail> processTeamWinLongestGame(List<TeamDetail> list) {
 		return list.stream()
-				.sorted((e1, e2) -> e2.getGameDuration() - e1.getGameDuration())
+				.sorted(Comparator.comparing(TeamDetail::getGameDuration).reversed())
 				.limit(numResults)
 				.collect(Collectors.toList());
 	}
 
 	public List<TeamDetail> processTeamWinShortestGame(List<TeamDetail> list) {
 		return list.stream()
-				.sorted((e1, e2) -> e1.getGameDuration() - e2.getGameDuration())
+				.sorted(Comparator.comparing(TeamDetail::getGameDuration))
 				.limit(numResults)
 				.collect(Collectors.toList());
 	}
@@ -87,7 +89,7 @@ public class ProcessData {
 	public Map<String, Long> processReverseStringLongMap(Map<String, Long> map) {
 		Map<String, Long> orderedMap = new LinkedHashMap<>();  
 		map.entrySet().stream()
-			.sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+			.sorted(Comparator.comparing(Entry::getValue))
 			.limit(numResults)
 			.forEachOrdered(e -> orderedMap.put(e.getKey(), e.getValue()));
 		return orderedMap;
@@ -95,35 +97,35 @@ public class ProcessData {
 
 	public List<TeamDetail> processMostTeamAssists(List<TeamDetail> list) {
 		return list.stream()
-				.sorted((e1, e2) -> e2.getAssists() - e1.getAssists())
+				.sorted(Comparator.comparing(TeamDetail::getAssists).reversed())
 				.limit(numResults)
 				.collect(Collectors.toList());
 	}
 
 	public List<PlayerDetail> processAssists(List<PlayerDetail> list) {
 		return list.stream()
-				.sorted((e1, e2) -> e2.getAssists() - e1.getAssists())
+				.sorted(Comparator.comparing(PlayerDetail::getAssists).reversed())
 				.limit(numResults)
 				.collect(Collectors.toList());
 	}
 
 	public List<PlayerDetail> processGPM(List<PlayerDetail> list) {
 		return list.stream()
-				.sorted((e1, e2) -> e2.getGPM() - e1.getGPM())
+				.sorted(Comparator.comparing(PlayerDetail::getGPM).reversed())
 				.limit(numResults)
 				.collect(Collectors.toList());
 	}
 
 	public List<PlayerDetail> processDeaths(List<PlayerDetail> list) {
 		return list.stream()
-				.sorted((e1, e2) -> e2.getDeaths() - e1.getDeaths())
+				.sorted(Comparator.comparing(PlayerDetail::getDeaths).reversed())
 				.limit(numResults)
 				.collect(Collectors.toList());
 	}
 
 	public List<TeamDetail> processFewestDeaths(List<TeamDetail> list) {
 		return list.stream()
-				.sorted((e1, e2) -> e1.getDeaths() - e2.getDeaths())
+				.sorted(Comparator.comparing(TeamDetail::getDeaths))
 				.limit(numResults)
 				.collect(Collectors.toList());
 	}
